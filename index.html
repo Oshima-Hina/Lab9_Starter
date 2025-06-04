@@ -7,6 +7,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lab 9</title>
 
+  <script src="./error.js"></script>
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "4e81aa26e7624e4c97e0736b63ef5bdb"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
+
   <style>
     button {
       margin: 3px;
@@ -69,21 +78,21 @@
     </form>
 
     <section id="error-btns">
-      <button>Console Log</button>
-      <button>Console Error</button>
-      <button>Console Count</button>
-      <button>Console Warn</button>
-      <button>Console Assert</button>
-      <button>Console Clear</button>
-      <button>Console Dir</button>
-      <button>Console dirxml</button>
-      <button>Console Group Start</button>
-      <button>Console Group End</button>
-      <button>Console Table</button>
-      <button>Start Timer</button>
-      <button>End Timer</button>
-      <button>Console Trace</button>
-      <button>Trigger a Global Error</button>
+      <button id="log">Console Log</button>
+      <button id="error">Console Error</button>
+      <button id="count">Console Count</button>
+      <button id="warn">Console Warn</button>
+      <button id="assert">Console Assert</button>
+      <button id="clear">Console Clear</button>
+      <button id="dir">Console Dir</button>
+      <button id="dirxml">Console dirxml</button>
+      <button id="group-start">Console Group Start</button>
+      <button id="group-end">Console Group End</button>
+      <button id="table">Console Table</button>
+      <button id="start-timer">Start Timer</button>
+      <button id="end-timer">End Timer</button>
+      <button id="trace">Console Trace</button>
+      <button id="global">Trigger a Global Error</button>
     </section>
   </main>
 
@@ -95,7 +104,28 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      class ValidationError extends Error {
+        constructor(message) {
+          super(message); // Call the Error constructor
+          this.name = "ValidationError";
+        }
+      }
+      function processUserInput(input) {
+        let num = Number(input)
+        if (isNaN(num)) {
+          throw new ValidationError("Input must be a number.");
+        }
+      }
+      try{
+        processUserInput(firstNum);
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      } catch (err){
+        if (err instanceof ValidationError) {
+            console.error(`Validation failed: ${err.message}`);
+          } else {
+            console.error("Unexpected error:", err);
+          }
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
